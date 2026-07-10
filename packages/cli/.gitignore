@@ -1,0 +1,17 @@
+node_modules
+
+# secrets
+.env
+.env.local
+
+# pipeline outputs
+script.txt
+architecture.mermaid
+episode.wav
+episode.mp3
+captions.srt
+explainer.mp4
+
+# python
+__pycache__/
+*.pyc

@@ -1,0 +1,20 @@
+{
+  "name": "readme-radio",
+  "version": "1.0.0",
+  "description": "Turn any repo into an explainer video",
+  "main": "index.js",
+  "bin": {
+    "readme-radio": "./index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1",
+    "ora": "^7.0.1",
+    "remotion": "^4.0.0"
+  }
+}

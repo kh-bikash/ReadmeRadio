@@ -1,0 +1,7 @@
+{
+  "name": "readme-radio-workspace",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
