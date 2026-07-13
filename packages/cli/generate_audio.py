@@ -58,9 +58,7 @@ def main():
     
     print("Generating audio...")
     try:
-        # Generate to a file directly, or get the numpy array and save it.
-        # KittenTTS generate_to_file has arguments: text, output_path, voice, speed, sample_rate, clean_text
-        model.generate_to_file(text, args.output_audio, voice="Jasper", speed=1.0, sample_rate=24000, clean_text=True)
+        model.generate_to_file(text, args.output_audio, speed=1.0, sample_rate=24000)
     except Exception as e:
         print(f"Error generating audio: {e}")
         sys.exit(1)

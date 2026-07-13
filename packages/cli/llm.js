@@ -1,7 +1,12 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const GLM_API_KEY = process.env.GLM_API_KEY;
 const API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
@@ -25,7 +30,7 @@ Respond ONLY with valid JSON.`;
     const response = await axios.post(
       API_URL,
       {
-        model: 'glm-4',
+        model: 'glm-4-flash',
         messages: [
           { role: 'system', content: 'You are a helpful assistant that outputs strictly valid JSON.' },
           { role: 'user', content: prompt }
@@ -52,7 +57,11 @@ Respond ONLY with valid JSON.`;
 
     return JSON.parse(content);
   } catch (error) {
-    console.error('Error calling GLM API:', error.response ? error.response.data : error.message);
-    throw new Error('Failed to generate script with AI');
+    const errorData = error.response ? error.response.data : null;
+    console.error('Error calling GLM API:', errorData || error.message);
+    if (errorData && errorData.error && errorData.error.code === '1113') {
+      throw new Error('Zhipu AI account balance is insufficient (余额不足). Please recharge your account on open.bigmodel.cn.');
+    }
+    throw new Error('Failed to generate script with AI: ' + (errorData?.error?.message || error.message));
   }
 }
