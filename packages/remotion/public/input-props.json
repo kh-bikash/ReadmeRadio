@@ -1,0 +1,153 @@
+{
+  "title": "pallets/flask",
+  "script": "Hello, developers! Ever wish you could create a web application in no time at all? Well, you're in luck today!\n\nIntroducing Flask, the go-to lightweight web application framework for Python.\n\nFlask is a simple wrapper around Werkzeug and Jinja, allowing you to start building web apps quickly. It's flexible, giving you the freedom to choose your dependencies and project layout.\n\nWith Flask, you can add new features effortlessly thanks to a vibrant community that offers numerous extensions.\n\nSo, whether you're a beginner or a seasoned pro, Flask has you covered. Let's make web development easy, efficient, and enjoyable!",
+  "captions": [
+    {
+      "index": 1,
+      "start": 0,
+      "end": 3,
+      "text": "Hello, developers."
+    },
+    {
+      "index": 2,
+      "start": 3,
+      "end": 8,
+      "text": "Ever wish you could create a web application in no time at all."
+    },
+    {
+      "index": 3,
+      "start": 8,
+      "end": 11,
+      "text": "Well, you are in luck today."
+    },
+    {
+      "index": 4,
+      "start": 11,
+      "end": 17,
+      "text": "Introducing Flask, the Go to Lightweight Web Application Framework for Python."
+    },
+    {
+      "index": 5,
+      "start": 17,
+      "end": 22,
+      "text": "Flask is a simple wrapper around worksuag and jinnia,"
+    },
+    {
+      "index": 6,
+      "start": 22,
+      "end": 26,
+      "text": "allowing you to start building web apps quickly."
+    },
+    {
+      "index": 7,
+      "start": 26,
+      "end": 33,
+      "text": "It is flexible giving you the freedom to choose your dependencies and project layout."
+    },
+    {
+      "index": 8,
+      "start": 33,
+      "end": 42,
+      "text": "With Flask, you can add new features effortlessly thanks to a vibrant community that offers numerous extensions."
+    },
+    {
+      "index": 9,
+      "start": 42,
+      "end": 48,
+      "text": "So, whether you are a beginner or a seasoned pro, Flask has you covered."
+    },
+    {
+      "index": 10,
+      "start": 48,
+      "end": 53,
+      "text": "Let us make web development easy, efficient and enjoyable."
+    }
+  ],
+  "mermaidCode": "graph TD; Start[Developing Web Apps] --> Use[Flask]; Use --> Choose[WSGI, Werkzeug, Jinja]; Choose --> Create[Web Application]; Create --> Extend[With Extensions]; Extend --> Deploy[Flask App]; Deploy --> Success[Web Application Launched]",
+  "duration": 53,
+  "layout": {
+    "Start": {
+      "id": "Start",
+      "label": "Developing Web Apps",
+      "x": 80,
+      "y": 240,
+      "col": 0,
+      "row": 0
+    },
+    "Use": {
+      "id": "Use",
+      "label": "Flask",
+      "x": 186.66666666666669,
+      "y": 240,
+      "col": 1,
+      "row": 0
+    },
+    "Choose": {
+      "id": "Choose",
+      "label": "WSGI, Werkzeug, Jinja",
+      "x": 293.33333333333337,
+      "y": 240,
+      "col": 2,
+      "row": 0
+    },
+    "Create": {
+      "id": "Create",
+      "label": "Web Application",
+      "x": 400,
+      "y": 240,
+      "col": 3,
+      "row": 0
+    },
+    "Extend": {
+      "id": "Extend",
+      "label": "With Extensions",
+      "x": 506.6666666666667,
+      "y": 240,
+      "col": 4,
+      "row": 0
+    },
+    "Deploy": {
+      "id": "Deploy",
+      "label": "Flask App",
+      "x": 613.3333333333334,
+      "y": 240,
+      "col": 5,
+      "row": 0
+    },
+    "Success": {
+      "id": "Success",
+      "label": "Web Application Launched",
+      "x": 720,
+      "y": 240,
+      "col": 6,
+      "row": 0
+    }
+  },
+  "connections": [
+    {
+      "from": "Start",
+      "to": "Use"
+    },
+    {
+      "from": "Use",
+      "to": "Choose"
+    },
+    {
+      "from": "Choose",
+      "to": "Create"
+    },
+    {
+      "from": "Create",
+      "to": "Extend"
+    },
+    {
+      "from": "Extend",
+      "to": "Deploy"
+    },
+    {
+      "from": "Deploy",
+      "to": "Success"
+    }
+  ],
+  "audioUrl": "episode.wav"
+}
