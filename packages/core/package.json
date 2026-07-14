@@ -1,0 +1,10 @@
+{
+  "name": "@readme-radio/core",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./diagram": "./src/diagram.js",
+    "./repository": "./src/repository.js"
+  }
+}

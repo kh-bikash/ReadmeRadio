@@ -1,7 +1,17 @@
 {
   "name": "readme-radio-workspace",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=web",
+    "build": "npm run build --workspace=@readme-radio/video && npm run build --workspace=web",
+    "lint": "npm run lint --workspace=@readme-radio/video && npm run lint --workspace=web",
+    "test": "node --test packages/core/test/diagram.test.js packages/core/test/repository.test.js",
+    "check": "npm run test && npm run lint && npm run build"
+  }
 }

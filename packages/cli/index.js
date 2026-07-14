@@ -4,15 +4,65 @@ import { program } from 'commander';
 import ora from 'ora';
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
-import util from 'util';
+import { spawn } from 'child_process';
 import axios from 'axios';
 import { fileURLToPath } from 'url';
 import { generateScriptAndDiagram } from './llm.js';
+import { calculateLayout, parseMermaid } from '../core/src/diagram.js';
+import { normalizeGitHubRepository } from '../core/src/repository.js';
 
-const execAsync = util.promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+function runCommand(command, args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd: options.cwd,
+      env: options.env || process.env,
+      shell: options.shell !== undefined ? options.shell : (process.platform === 'win32'),
+      windowsHide: true,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => {
+      const text = chunk.toString();
+      stdout += text;
+      if (options.forwardOutput) process.stdout.write(text);
+    });
+    child.stderr.on('data', (chunk) => {
+      const text = chunk.toString();
+      stderr += text;
+      if (options.forwardOutput) process.stderr.write(text);
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code === 0) resolve({ stdout, stderr });
+      else reject(new Error(stderr.trim() || stdout.trim() || `${command} exited with code ${code}`));
+    });
+  });
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function srtToVtt(srtContent) {
+  return `WEBVTT\n\n${srtContent.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2')}`;
+}
+
+function progressReporter(enabled) {
+  return (stage, progress, message) => {
+    if (enabled) {
+      process.stdout.write(`${JSON.stringify({ type: 'progress', stage, progress, message })}\n`);
+    }
+  };
+}
 
 // Helper to find Python executable in venv
 async function getPythonExecutable() {
@@ -53,161 +103,43 @@ function parseSRT(srtContent) {
   }).filter(Boolean);
 }
 
-// Matches every Mermaid flowchart node-shape wrapper, most-specific first,
-// so e.g. `X((Label))` isn't mistaken for `X(` + stray text.
-const NODE_SHAPE_REGEX =
-  /([a-zA-Z0-9_-]+)(?:\(\(([^)]+)\)\)|\(\[([^\]]+)\]\)|\[\[([^\]]+)\]\]|\[\(([^)]+)\)\]|\{\{([^}]+)\}\}|\[\/([^\]/]+)\/\]|\[\\([^\]\\]+)\\\]|\(([^)]+)\)|\{([^}]+)\}|\[([^\]]+)\])/g;
-
-function cleanLabel(text) {
-  return text.trim().replace(/^["']|["']$/g, "");
-}
-
-function parseMermaid(code) {
-  const lines = code.split(/[\r\n;]+/);
-  const nodesList = [];
-  const connectionsList = [];
-  const skipPrefixes = ['graph', 'flowchart', 'subgraph', 'end', 'classDef', 'class ', 'style ', 'click '];
-
-  const addNode = (id, label) => {
-    if (!nodesList.some((n) => n.id === id)) {
-      nodesList.push({ id, label: cleanLabel(label) });
-    }
-  };
-
-  for (let rawLine of lines) {
-    const line = rawLine.trim();
-    if (!line || skipPrefixes.some((p) => line.startsWith(p))) continue;
-
-    // Extract node declarations in any shape: A[Label], B(Label), C{Label},
-    // D((Label)), E([Label]), F[[Label]], G{{Label}}, etc.
-    let match;
-    NODE_SHAPE_REGEX.lastIndex = 0;
-    while ((match = NODE_SHAPE_REGEX.exec(line)) !== null) {
-      const id = match[1];
-      const label = match.slice(2).find((g) => g !== undefined) || id;
-      addNode(id, label);
-    }
-
-    // Replace shape wrappers with the bare id, and drop edge labels
-    // (-->|Text|) so only arrows and ids remain for connection parsing.
-    const cleanLine = line
-      .replace(NODE_SHAPE_REGEX, (_m, id) => id)
-      .replace(/\|[^|]*\|/g, "");
-
-    const arrowRegex = /-{1,3}>|={1,3}>|-\.+>/g;
-    const parts = cleanLine.split(arrowRegex).map((s) => s.trim()).filter(Boolean);
-    for (let i = 0; i < parts.length - 1; i++) {
-      const from = parts[i];
-      const to = parts[i + 1];
-      if (/^[a-zA-Z0-9_-]+$/.test(from) && /^[a-zA-Z0-9_-]+$/.test(to)) {
-        connectionsList.push({ from, to });
-        addNode(from, from);
-        addNode(to, to);
-      }
-    }
-  }
-
-  return { nodes: nodesList, connections: connectionsList };
-}
-
-// Layout coordinate calculator (topological BFS layered-graph layout)
-function calculateLayout(nodes, connections) {
-  const colMap = {};
-  const inDegree = {};
-  
-  for (const node of nodes) {
-    colMap[node.id] = 0;
-    inDegree[node.id] = 0;
-  }
-  
-  for (const conn of connections) {
-    inDegree[conn.to] = (inDegree[conn.to] || 0) + 1;
-  }
-  
-  const queue = [];
-  for (const node of nodes) {
-    if (inDegree[node.id] === 0) {
-      queue.push({ id: node.id, depth: 0 });
-    }
-  }
-  
-  if (queue.length === 0 && nodes.length > 0) {
-    queue.push({ id: nodes[0].id, depth: 0 });
-  }
-  
-  while (queue.length > 0) {
-    const { id, depth } = queue.shift();
-    colMap[id] = Math.max(colMap[id], depth);
-    
-    const children = connections.filter(c => c.from === id).map(c => c.to);
-    for (const child of children) {
-      queue.push({ id: child, depth: depth + 1 });
-    }
-  }
-  
-  const cols = {};
-  for (const node of nodes) {
-    const col = colMap[node.id] || 0;
-    if (!cols[col]) cols[col] = [];
-    cols[col].push(node);
-  }
-  
-  const layout = {};
-  const totalCols = Object.keys(cols).length;
-  
-  const width = 640;  // Width of graph area
-  const height = 480; // Height of graph area
-  const colWidth = width / Math.max(totalCols - 1, 1);
-  
-  Object.keys(cols).forEach((colKey) => {
-    const col = parseInt(colKey, 10);
-    const colNodes = cols[col];
-    const rowHeight = height / (colNodes.length + 1);
-    
-    colNodes.forEach((node, rowIdx) => {
-      layout[node.id] = {
-        id: node.id,
-        label: node.label,
-        x: 80 + col * colWidth, // Offset slightly
-        y: rowHeight * (rowIdx + 1),
-        col: col,
-        row: rowIdx
-      };
-    });
-  });
-  
-  return layout;
-}
-
 program
   .name('readme-radio')
   .description('Turn any GitHub repository into an explainer video')
   .argument('<repository>', 'GitHub repository URL or owner/repo (e.g., pallets/flask)')
   .option('-e, --engine <engine>', 'Rendering engine: remotion or hyperframes', 'remotion')
   .option('-o, --output-dir <outputDir>', 'Output directory for all generated assets', '.')
+  .option('--tone <tone>', 'Narration tone: technical, friendly, cinematic, or concise', 'friendly')
+  .option('--target-minutes <minutes>', 'Approximate narration duration in minutes', '3')
+  .option('--aspect-ratio <ratio>', 'Video aspect ratio: 16:9, 1:1, or 9:16', '16:9')
+  .option('--json-progress', 'Emit newline-delimited JSON progress events', false)
   .action(async (repository, options) => {
-    let repoName = repository;
-    if (repository.includes('github.com/')) {
-      repoName = repository.split('github.com/')[1];
-    }
-    
-    const targetOutputDir = path.resolve(options.outputDir);
-    await fs.mkdir(targetOutputDir, { recursive: true });
-
-    const spinner = ora(`Analyzing repository: ${repoName}...`).start();
-
+    const report = progressReporter(options.jsonProgress);
+    let spinner;
     try {
+      const repoName = normalizeGitHubRepository(repository);
+      if (!['remotion', 'hyperframes'].includes(options.engine)) throw new Error('Engine must be remotion or hyperframes');
+      if (!['technical', 'friendly', 'cinematic', 'concise'].includes(options.tone)) throw new Error('Unsupported narration tone');
+      if (!['16:9', '1:1', '9:16'].includes(options.aspectRatio)) throw new Error('Unsupported aspect ratio');
+      const targetMinutes = Number(options.targetMinutes);
+      if (!Number.isFinite(targetMinutes) || targetMinutes < 1 || targetMinutes > 5) throw new Error('Target duration must be between 1 and 5 minutes');
+
+      const targetOutputDir = path.resolve(options.outputDir);
+      await fs.mkdir(targetOutputDir, { recursive: true });
+      spinner = ora({ text: `Analyzing repository: ${repoName}...`, isSilent: options.jsonProgress }).start();
+
       // Step 1: Fetch README
+      report('fetching', 8, 'Fetching repository README');
       spinner.text = `Fetching README for ${repoName}...`;
       const readmeUrl = `https://raw.githubusercontent.com/${repoName}/main/README.md`;
       let readmeContent = '';
       try {
-        const response = await axios.get(readmeUrl);
+        const response = await axios.get(readmeUrl, { timeout: 20000, maxContentLength: 1_000_000, responseType: 'text' });
         readmeContent = response.data;
-      } catch (e) {
+      } catch {
         // Fallback to master
         const fallbackUrl = `https://raw.githubusercontent.com/${repoName}/master/README.md`;
-        const response = await axios.get(fallbackUrl);
+        const response = await axios.get(fallbackUrl, { timeout: 20000, maxContentLength: 1_000_000, responseType: 'text' });
         readmeContent = response.data;
       }
 
@@ -215,8 +147,12 @@ program
       console.log('README length:', readmeContent.length);
 
       // Step 2: Generate Script via GLM
+      report('scripting', 22, 'Writing and validating the narration outline');
       spinner.start('Writing script with AI...');
-      const responseData = await generateScriptAndDiagram(readmeContent, repoName);
+      const responseData = await generateScriptAndDiagram(readmeContent, repoName, {
+        tone: options.tone,
+        targetMinutes,
+      });
       
       const script = responseData.script;
       const mermaid = responseData.mermaid;
@@ -245,8 +181,10 @@ program
       await fs.writeFile(scriptPath, scriptText);
       await fs.writeFile(mermaidPath, mermaidText);
       spinner.succeed('Script and Mermaid diagram generated');
+      report('scripting', 38, 'Script and architecture diagram are ready');
 
       // Step 3: Audio Generation via Python Bridge
+      report('audio', 45, 'Synthesizing narration and aligning captions');
       spinner.start('Synthesizing voiceover and generating captions...');
       const pythonScriptPath = path.join(__dirname, 'generate_audio.py');
       const pythonExe = await getPythonExecutable();
@@ -256,26 +194,39 @@ program
       const targetAudioPath = path.join(targetOutputDir, audioWavName);
       const targetSrtPath = path.join(targetOutputDir, captionsSrtName);
 
-      const cmd = `"${pythonExe}" "${pythonScriptPath}" --input "${scriptPath}" --output-audio "${targetAudioPath}" --output-srt "${targetSrtPath}"`;
-      
-      await execAsync(cmd);
+      await runCommand(pythonExe, [
+        pythonScriptPath,
+        '--input', scriptPath,
+        '--output-audio', targetAudioPath,
+        '--output-srt', targetSrtPath,
+      ], { forwardOutput: !options.jsonProgress });
       spinner.succeed('Audio and captions ready');
+      report('captions', 68, 'Narration and captions are synchronized');
 
       // Parse captions
       const srtContent = await fs.readFile(targetSrtPath, 'utf8');
       const captionsJson = parseSRT(srtContent);
       const totalDuration = captionsJson.length > 0 ? captionsJson[captionsJson.length - 1].end : 60;
+      await fs.writeFile(path.join(targetOutputDir, 'captions.vtt'), srtToVtt(srtContent));
+      await fs.writeFile(path.join(targetOutputDir, 'captions.json'), JSON.stringify(captionsJson, null, 2));
 
       // Parse Mermaid & Calculate Layout
       const { nodes, connections } = parseMermaid(mermaidText);
-      const layoutMap = calculateLayout(nodes, connections);
+      const layoutMap = calculateLayout(nodes, connections, {
+        width: 640,
+        height: 480,
+        cardWidth: 180,
+        cardHeight: 68,
+        padding: 32,
+      });
 
       const finalVideoPath = path.join(targetOutputDir, 'explainer.mp4');
 
       if (options.engine === 'hyperframes') {
         // Step 4: Render via HyperFrames
+        report('rendering', 74, 'Rendering the HyperFrames composition');
         spinner.start('Rendering video with HyperFrames...');
-        const hyperframesTemplateDir = path.join(__dirname, '../hyperframes');
+        const hyperframesTemplateDir = path.join(targetOutputDir, '.hyperframes');
         await fs.mkdir(hyperframesTemplateDir, { recursive: true });
         
         // Copy audio wav to hyperframes
@@ -291,7 +242,7 @@ program
           return `
             <div class="card-item" style="left: ${node.x}px; top: ${node.y}px; animation-name: cardHighlight; animation-delay: ${delay}s; animation-duration: ${nodeDuration}s;">
               <div class="card-num">${i + 1}</div>
-              <div class="card-label">${node.label}</div>
+              <div class="card-label">${escapeHtml(node.label)}</div>
             </div>
           `;
         }).join('\n');
@@ -325,10 +276,6 @@ program
               <path d="${pathD}" class="svg-path-bg" />
               <!-- Animated Glowing path -->
               <path id="path-${idx}" d="${pathD}" class="svg-path-fg" style="animation-delay: ${delay}s;" />
-              <!-- Native Traveling Particle -->
-              <circle r="5" fill="#a78bfa" class="flow-particle" style="animation-delay: ${delay}s;">
-                <animateMotion dur="3s" repeatCount="indefinite" path="${pathD}" />
-              </circle>
             </g>
           `;
         }).join('\n');
@@ -339,10 +286,16 @@ program
           const duration = caption.end - caption.start;
           return `
             <div class="caption-item" style="animation-name: captionFade; animation-delay: ${start}s; animation-duration: ${duration}s;">
-              ${caption.text.replace(/"/g, '&quot;')}
+              ${escapeHtml(caption.text)}
             </div>
           `;
         }).join('\n');
+
+        const [compositionWidth, compositionHeight] = options.aspectRatio === '9:16'
+          ? [1080, 1920]
+          : options.aspectRatio === '1:1'
+            ? [1080, 1080]
+            : [1920, 1080];
 
         // Full HyperFrames HTML Composition Template
         const htmlContent = `<!DOCTYPE html>
@@ -350,7 +303,7 @@ program
 <head>
   <meta charset="UTF-8">
   <title>README Radio Explainer</title>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -359,10 +312,16 @@ program
     }
     body {
       background-color: #050507;
+      width: ${compositionWidth}px;
+      height: ${compositionHeight}px;
+      overflow: hidden;
+    }
+    [data-composition-id="readme-radio"] {
+      background-color: #050507;
       color: #ffffff;
-      font-family: 'Outfit', sans-serif;
-      width: 1920px;
-      height: 1080px;
+      font-family: 'Geist', system-ui, sans-serif;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -612,14 +571,15 @@ program
     }
   </style>
 </head>
-<body id="stage" data-duration="${totalDuration}">
+<body>
+ <div id="stage" data-composition-id="readme-radio" data-start="0" data-duration="${totalDuration}" data-width="${compositionWidth}" data-height="${compositionHeight}" data-track-index="0">
   <div class="bg-glow-1"></div>
   <div class="bg-glow-2"></div>
 
   <header>
     <div>
       <span class="badge">README RADIO (HYPERFRAMES)</span>
-      <h1>${repoName}</h1>
+      <h1>${escapeHtml(repoName)}</h1>
     </div>
   </header>
 
@@ -652,7 +612,12 @@ program
     </div>
   </footer>
 
-  <audio src="episode.wav" autoplay></audio>
+  <audio id="narration" src="episode.wav" data-start="0" data-duration="${totalDuration}" data-track-index="1" data-volume="1"></audio>
+ </div>
+ <script>
+   window.__timelines = window.__timelines || {};
+   window.__timelines["readme-radio"] = gsap.timeline({ paused: true });
+ </script>
 </body>
 </html>`;
 
@@ -660,9 +625,9 @@ program
         await fs.writeFile(hfIndexHtml, htmlContent);
 
         try {
-          // Render HyperFrames composition
-          const hfRenderCmd = `npx hyperframes render . -o "${finalVideoPath}"`;
-          await execAsync(hfRenderCmd, { cwd: hyperframesTemplateDir });
+          const npxCommand = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+          await runCommand(npxCommand, ['hyperframes', 'lint', '.'], { cwd: hyperframesTemplateDir, forwardOutput: !options.jsonProgress });
+          await runCommand(npxCommand, ['hyperframes', 'render', '.', '--output', finalVideoPath], { cwd: hyperframesTemplateDir, forwardOutput: !options.jsonProgress });
           spinner.succeed('Video rendered successfully with HyperFrames!');
         } catch (err) {
           spinner.fail('Error rendering video with HyperFrames');
@@ -671,13 +636,16 @@ program
         }
       } else {
         // Step 4: Render via Remotion
+        report('rendering', 74, 'Rendering the Remotion composition');
         spinner.start('Rendering video with Remotion...');
         const remotionPath = path.join(__dirname, '../remotion');
         
-        // Copy audio to Remotion public directory
+        // Use a unique public asset folder so concurrent renders never overwrite each other.
         const remotionPublicDir = path.join(remotionPath, 'public');
-        await fs.mkdir(remotionPublicDir, { recursive: true });
-        const remotionAudioPath = path.join(remotionPublicDir, 'episode.wav');
+        const renderToken = path.basename(targetOutputDir).replace(/[^a-zA-Z0-9_-]/g, '') || `render-${Date.now()}`;
+        const remotionAssetDir = path.join(remotionPublicDir, 'jobs', renderToken);
+        await fs.mkdir(remotionAssetDir, { recursive: true });
+        const remotionAudioPath = path.join(remotionAssetDir, 'episode.wav');
         await fs.copyFile(targetAudioPath, remotionAudioPath);
 
         // Copy captions, script, diagram details to a props JSON file
@@ -689,27 +657,46 @@ program
           duration: totalDuration,
           layout: layoutMap,
           connections: connections,
-          audioUrl: 'episode.wav'
+          audioUrl: `jobs/${renderToken}/episode.wav`,
+          aspectRatio: options.aspectRatio,
         };
-        const propsFile = path.join(remotionPublicDir, 'input-props.json');
+        const propsFile = path.join(targetOutputDir, 'input-props.json');
         await fs.writeFile(propsFile, JSON.stringify(props, null, 2));
 
         try {
-          // Render Main composition in Remotion
-          const remotionRenderCmd = `npx remotion render src/index.ts Main "${finalVideoPath}" --props=public/input-props.json`;
-          await execAsync(remotionRenderCmd, { cwd: remotionPath });
+          const npxCommand = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+          await runCommand(npxCommand, ['remotion', 'render', 'src/index.ts', 'Main', finalVideoPath, `--props=${propsFile}`], {
+            cwd: remotionPath,
+            forwardOutput: !options.jsonProgress,
+          });
           spinner.succeed('Video rendered successfully with Remotion!');
         } catch (err) {
           spinner.fail('Error rendering video with Remotion');
           console.error(err.message);
           throw err;
+        } finally {
+          await fs.rm(remotionAssetDir, { recursive: true, force: true });
         }
       }
 
+      const manifest = {
+        version: 1,
+        repository: repoName,
+        engine: options.engine,
+        tone: options.tone,
+        aspectRatio: options.aspectRatio,
+        duration: totalDuration,
+        generatedAt: new Date().toISOString(),
+        files: ['explainer.mp4', 'episode.wav', 'captions.srt', 'captions.vtt', 'captions.json', 'script.txt', 'architecture.mermaid'],
+      };
+      await fs.writeFile(path.join(targetOutputDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
+      report('complete', 100, 'Explainer video is ready');
       console.log(`\nDone! Output saved to: ${targetOutputDir}`);
     } catch (error) {
-      spinner.fail('An error occurred during generation');
+      spinner?.fail('An error occurred during generation');
+      report('failed', 100, error.message || 'Generation failed');
       console.error(error.stack || error.message);
+      process.exitCode = 1;
     }
   });
 

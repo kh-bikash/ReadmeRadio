@@ -6,7 +6,7 @@
 
 `README.md` in → 🎙️ voiceover + 📽️ captioned video out.
 
-[![Node](https://img.shields.io/badge/Node.js-18%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Node](https://img.shields.io/badge/Node.js-22%2B-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
 [![Remotion](https://img.shields.io/badge/Remotion-4.0-black?style=for-the-badge&logo=react&logoColor=61DAFB)](https://www.remotion.dev)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
@@ -133,8 +133,9 @@ graph TD
 | Package | Role | Status |
 |---|---|---|
 | [`packages/cli`](packages/cli) | The `readme-radio` command — fetches the README, calls the LLM, drives audio/caption generation, and kicks off the Remotion render | ✅ Functional end-to-end pipeline |
-| [`packages/remotion`](packages/remotion) | The Remotion project that renders the actual video from the script, voiceover, and Mermaid diagram | 🚧 Scaffold — composition not yet built |
-| [`packages/web`](packages/web) | A Next.js app, presumably a hosted front-end for the tool | 🚧 Default scaffold |
+| [`packages/core`](packages/core) | Shared repository validation, Mermaid parsing, cycle-safe layout, and cue matching | ✅ Tested |
+| [`packages/remotion`](packages/remotion) | Responsive Remotion renderer for landscape, square, and portrait videos | ✅ Functional |
+| [`packages/web`](packages/web) | Interactive Next.js studio with queued jobs, real-time progress, cancellation, transcript seeking, and downloads | ✅ Functional |
 
 ## 🛠️ Tools & Tech Stack
 
@@ -189,6 +190,22 @@ node index.js pallets/flask
 readme-radio pallets/flask
 ```
 
+Run the interactive studio from the repository root:
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:3000`, enter a public GitHub repository, and choose the narration tone, duration, renderer, and aspect ratio. Each request runs in an isolated job directory and streams real pipeline progress to the browser.
+
+Optional server controls:
+
+```bash
+README_RADIO_CONCURRENCY=1       # simultaneous worker limit
+README_RADIO_RATE_LIMIT=6        # generation requests per IP per hour
+README_RADIO_API_TOKEN=...       # bearer token for direct API access
+```
+
 **Output:** `script.txt`, `architecture.mermaid`, `episode.wav`, `captions.srt`, `explainer.mp4`
 
 ## 🧭 Pipeline Stages
@@ -211,10 +228,16 @@ stateDiagram-v2
     Done: ✅ Done
 ```
 
-## ⚠️ Known Gaps
+## ✅ Quality checks
 
-- `packages/remotion/src/Composition.tsx` is currently a stub (`return null`) — the video scene itself still needs to be built out.
-- `packages/web` is unwired scaffold with no connection to the CLI pipeline yet.
+```bash
+npm test       # shared parser, layout, cue, and repository validation tests
+npm run lint   # Next.js, Remotion, and TypeScript checks
+npm run build  # Remotion bundle and production web build
+npm run check  # all of the above
+```
+
+The bundled worker architecture is intended for a persistent, self-hosted Node process. A serverless deployment should move workers and generated artifacts to a durable queue and object storage while keeping the same `/api/jobs` contract.
 
 ---
 
