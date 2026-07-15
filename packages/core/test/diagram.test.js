@@ -8,6 +8,15 @@ test("parses common Mermaid node shapes and de-duplicates edges", () => {
   assert.deepEqual(parsed.connections, [{ from: "A", to: "B" }, { from: "B", to: "C" }]);
 });
 
+test("captures edge labels in both pipe and dash syntax", () => {
+  const parsed = parseMermaid("graph TD\nA[Start] -->|fetches| B[API]\nB -- returns data --> C[Result]\nC --> D[Done]");
+  assert.deepEqual(parsed.connections, [
+    { from: "A", to: "B", label: "fetches" },
+    { from: "B", to: "C", label: "returns data" },
+    { from: "C", to: "D" },
+  ]);
+});
+
 test("lays out cyclic graphs without overflowing the canvas", () => {
   const parsed = parseMermaid("graph LR\nA[One] --> B[Two]\nB --> A");
   const layout = calculateLayout(parsed.nodes, parsed.connections, { width: 640, height: 360, cardWidth: 150 });

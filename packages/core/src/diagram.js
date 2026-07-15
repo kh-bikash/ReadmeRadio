@@ -1,3 +1,5 @@
+import { tokenize } from "./textMatch.js";
+
 const NODE_SHAPE_REGEX =
   /([a-zA-Z0-9_-]+)(?:\(\(([^)]+)\)\)|\(\[([^\]]+)\]\)|\[\[([^\]]+)\]\]|\[\(([^)]+)\)\]|\{\{([^}]+)\}\}|\[\/([^\]/]+)\/\]|\[\\([^\]\\]+)\\\]|\(([^)]+)\)|\{([^}]+)\}|\[([^\]]+)\])/g;
 
@@ -31,6 +33,17 @@ export function parseMermaid(code) {
       addNode(match[1], match.slice(2).find((group) => group !== undefined) || match[1]);
     }
 
+    // Collect edge labels in left-to-right order before stripping them, so
+    // they can be zipped back onto the connections extracted below — mermaid
+    // supports `A -->|label| B` and `A -- label --> B` label syntax.
+    const EDGE_LABEL_REGEX = /\|([^|]*)\||--\s*([^-][^-]*?)\s*-->/g;
+    const lineLabels = [];
+    let labelMatch;
+    while ((labelMatch = EDGE_LABEL_REGEX.exec(line)) !== null) {
+      const text = cleanLabel(labelMatch[1] ?? labelMatch[2] ?? "");
+      lineLabels.push(text || undefined);
+    }
+
     NODE_SHAPE_REGEX.lastIndex = 0;
     const cleanLine = line
       .replace(NODE_SHAPE_REGEX, (_match, id) => id)
@@ -45,7 +58,8 @@ export function parseMermaid(code) {
       const key = `${from}->${to}`;
       if (!connectionIds.has(key)) {
         connectionIds.add(key);
-        connections.push({ from, to });
+        const label = lineLabels[index];
+        connections.push(label ? { from, to, label } : { from, to });
       }
       addNode(from, from);
       addNode(to, to);
@@ -129,7 +143,7 @@ export function deriveNodeCueTimes(nodes, captions, duration) {
   const cues = {};
   const usedTimes = new Set();
   nodes.forEach((node, index) => {
-    const tokens = node.label.toLowerCase().split(/[^a-z0-9]+/).filter((token) => token.length > 2);
+    const tokens = tokenize(node.label).filter((token) => token.length > 2);
     let best = null;
     let bestScore = 0;
     for (const caption of captions) {

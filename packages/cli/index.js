@@ -8,8 +8,18 @@ import { spawn } from 'child_process';
 import axios from 'axios';
 import { fileURLToPath } from 'url';
 import { generateScriptAndDiagram } from './llm.js';
-import { calculateLayout, parseMermaid } from '../core/src/diagram.js';
+import { calculateLayout, deriveNodeCueTimes, parseMermaid } from '../core/src/diagram.js';
+import {
+  DIAGRAM_CANVAS_WIDTH,
+  DIAGRAM_CANVAS_HEIGHT,
+  DIAGRAM_CARD_WIDTH,
+  DIAGRAM_CARD_HEIGHT,
+  DIAGRAM_PADDING,
+} from '../core/src/diagramLayout.js';
 import { normalizeGitHubRepository } from '../core/src/repository.js';
+import { alignBeatsToWords, synthesizeFallbackBeats } from '../core/src/beats.js';
+
+const REMOTION_FPS = 30; // matches Root.tsx's fixed fps
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,6 +64,65 @@ function escapeHtml(value) {
 
 function srtToVtt(srtContent) {
   return `WEBVTT\n\n${srtContent.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2')}`;
+}
+
+function parseReadme(md) {
+  const features = [];
+  const codeBlocks = [];
+  const headers = [];
+  let description = '';
+
+  const lines = md.split(/\r?\n/);
+  let inCode = false;
+  let codeLang = '';
+  let codeAccum = [];
+
+  for (const line of lines) {
+    if (line.startsWith('```')) {
+      if (!inCode) {
+        inCode = true;
+        codeLang = line.slice(3).trim() || 'text';
+        codeAccum = [];
+      } else {
+        inCode = false;
+        const code = codeAccum.join('\n').trim();
+        if (code.length > 10 && code.length < 800) {
+          codeBlocks.push({ lang: codeLang, code });
+        }
+      }
+      continue;
+    }
+    if (inCode) {
+      codeAccum.push(line);
+      continue;
+    }
+
+    const headerMatch = line.match(/^(#{1,4})\s+(.+)/);
+    if (headerMatch) {
+      headers.push(headerMatch[2].trim());
+      continue;
+    }
+
+    const bulletMatch = line.match(/^[-*+]\s+(.+)/);
+    if (bulletMatch) {
+      const text = bulletMatch[1].replace(/\*\*(.+?)\*\*/g, '$1').replace(/`(.+?)`/g, '$1').trim();
+      if (text.length > 5 && text.length < 120) {
+        features.push(text);
+      }
+      continue;
+    }
+
+    if (!description && line.trim().length > 30 && !line.startsWith('#') && !line.startsWith('[') && !line.startsWith('!')) {
+      description = line.trim().replace(/\*\*(.+?)\*\*/g, '$1').replace(/`(.+?)`/g, '$1');
+    }
+  }
+
+  return {
+    features: features.slice(0, 8),
+    codeBlocks: codeBlocks.slice(0, 3),
+    headers: headers.slice(0, 6),
+    description: description.slice(0, 200),
+  };
 }
 
 function progressReporter(enabled) {
@@ -146,6 +215,9 @@ program
       spinner.succeed(`Fetched README for ${repoName}`);
       console.log('README length:', readmeContent.length);
 
+      // Extract structured content from README for rich visual scenes
+      const readmeData = parseReadme(readmeContent);
+
       // Step 2: Generate Script via GLM
       report('scripting', 22, 'Writing and validating the narration outline');
       spinner.start('Writing script with AI...');
@@ -191,14 +263,17 @@ program
       
       const audioWavName = 'episode.wav';
       const captionsSrtName = 'captions.srt';
+      const wordsJsonName = 'words.json';
       const targetAudioPath = path.join(targetOutputDir, audioWavName);
       const targetSrtPath = path.join(targetOutputDir, captionsSrtName);
+      const targetWordsPath = path.join(targetOutputDir, wordsJsonName);
 
       await runCommand(pythonExe, [
         pythonScriptPath,
         '--input', scriptPath,
         '--output-audio', targetAudioPath,
         '--output-srt', targetSrtPath,
+        '--output-words', targetWordsPath,
       ], { forwardOutput: !options.jsonProgress });
       spinner.succeed('Audio and captions ready');
       report('captions', 68, 'Narration and captions are synchronized');
@@ -210,15 +285,44 @@ program
       await fs.writeFile(path.join(targetOutputDir, 'captions.vtt'), srtToVtt(srtContent));
       await fs.writeFile(path.join(targetOutputDir, 'captions.json'), JSON.stringify(captionsJson, null, 2));
 
+      // Parse word-level timings (for karaoke captions)
+      let wordsJson = [];
+      try {
+        wordsJson = JSON.parse(await fs.readFile(targetWordsPath, 'utf8'));
+      } catch {
+        wordsJson = [];
+      }
+
       // Parse Mermaid & Calculate Layout
       const { nodes, connections } = parseMermaid(mermaidText);
       const layoutMap = calculateLayout(nodes, connections, {
-        width: 640,
-        height: 480,
-        cardWidth: 180,
-        cardHeight: 68,
-        padding: 32,
+        width: DIAGRAM_CANVAS_WIDTH,
+        height: DIAGRAM_CANVAS_HEIGHT,
+        cardWidth: DIAGRAM_CARD_WIDTH,
+        cardHeight: DIAGRAM_CARD_HEIGHT,
+        padding: DIAGRAM_PADDING,
       });
+
+      // Derive narration-synced cue times: each diagram node is highlighted
+      // when the narration actually mentions its label, not on an even timer.
+      const cueTimes = deriveNodeCueTimes(nodes, captionsJson, totalDuration);
+
+      // Resolve each how_it_works beat's authored nodeIds against the real
+      // parsed mermaid node ids, then convert the LLM-authored beat plan into
+      // real audio-accurate timing — or synthesize a fallback plan directly
+      // from captions when the LLM response didn't include usable beats.
+      const nodeIdSet = new Set(nodes.map((n) => n.id));
+      const rawBeats = responseData.beats;
+      let beatAssignments;
+      if (Array.isArray(rawBeats) && rawBeats.length > 0) {
+        const withResolvedNodes = rawBeats.map((b) => ({
+          ...b,
+          nodeIds: b.kind === 'how_it_works' ? (b.nodeIds ?? []).filter((id) => nodeIdSet.has(id)) : undefined,
+        }));
+        beatAssignments = alignBeatsToWords(withResolvedNodes, wordsJson, REMOTION_FPS, totalDuration);
+      } else {
+        beatAssignments = synthesizeFallbackBeats(captionsJson, nodes, readmeData, REMOTION_FPS);
+      }
 
       const finalVideoPath = path.join(targetOutputDir, 'explainer.mp4');
 
@@ -233,14 +337,22 @@ program
         const hfAudioPath = path.join(hyperframesTemplateDir, 'episode.wav');
         await fs.copyFile(targetAudioPath, hfAudioPath);
         
-        // Calculate highlighted intervals
-        const nodeDuration = totalDuration / (nodes.length || 1);
-        
+        // Highlight windows are narration-derived (cueTimes), not evenly spaced —
+        // mirrors the Remotion path's NODE_ACTIVE_WINDOW-based highlighting.
+        const HF_NODE_ACTIVE_WINDOW = 4;
+        const cueOrder = [...nodes].sort((a, b) => (cueTimes[a.id] ?? 0) - (cueTimes[b.id] ?? 0));
+        const nodeHighlight = {};
+        cueOrder.forEach((node, i) => {
+          const start = cueTimes[node.id] ?? 0;
+          const nextStart = cueOrder[i + 1] ? (cueTimes[cueOrder[i + 1].id] ?? totalDuration) : totalDuration;
+          nodeHighlight[node.id] = { start, duration: Math.max(2, Math.min(HF_NODE_ACTIVE_WINDOW + 2, nextStart - start)) };
+        });
+
         // Compile nodes HTML elements
         const nodesHtml = Object.values(layoutMap).map((node, i) => {
-          const delay = i * nodeDuration;
+          const { start, duration } = nodeHighlight[node.id] ?? { start: 0, duration: HF_NODE_ACTIVE_WINDOW };
           return `
-            <div class="card-item" style="left: ${node.x}px; top: ${node.y}px; animation-name: cardHighlight; animation-delay: ${delay}s; animation-duration: ${nodeDuration}s;">
+            <div class="card-item" style="left: ${node.x}px; top: ${node.y}px; animation-name: cardHighlight; animation-delay: ${start}s; animation-duration: ${duration}s;">
               <div class="card-num">${i + 1}</div>
               <div class="card-label">${escapeHtml(node.label)}</div>
             </div>
@@ -248,9 +360,8 @@ program
         }).join('\n');
 
         // Compile connecting lines SVG
-        // Nodes have dimensions approx 200px wide, 80px high
-        const cardW = 180;
-        const cardH = 68;
+        const cardW = DIAGRAM_CARD_WIDTH;
+        const cardH = DIAGRAM_CARD_HEIGHT;
         const svgLinesHtml = connections.map((conn, idx) => {
           const fromNode = layoutMap[conn.from];
           const toNode = layoutMap[conn.to];
@@ -268,7 +379,7 @@ program
           const cx2 = x2 - 50;
           const cy2 = y2;
           const pathD = `M ${x1} ${y1} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${x2} ${y2}`;
-          const delay = idx * (totalDuration / (connections.length || 1));
+          const delay = Math.max(cueTimes[conn.from] ?? 0, cueTimes[conn.to] ?? 0);
           
           return `
             <g>
@@ -653,6 +764,10 @@ program
           title: repoName,
           script: scriptText,
           captions: captionsJson,
+          words: wordsJson,
+          cueTimes,
+          beats: beatAssignments,
+          readmeData,
           mermaidCode: mermaidText,
           duration: totalDuration,
           layout: layoutMap,
@@ -687,7 +802,7 @@ program
         aspectRatio: options.aspectRatio,
         duration: totalDuration,
         generatedAt: new Date().toISOString(),
-        files: ['explainer.mp4', 'episode.wav', 'captions.srt', 'captions.vtt', 'captions.json', 'script.txt', 'architecture.mermaid'],
+        files: ['explainer.mp4', 'episode.wav', 'captions.srt', 'captions.vtt', 'captions.json', 'words.json', 'script.txt', 'architecture.mermaid'],
       };
       await fs.writeFile(path.join(targetOutputDir, 'manifest.json'), JSON.stringify(manifest, null, 2));
       report('complete', 100, 'Explainer video is ready');

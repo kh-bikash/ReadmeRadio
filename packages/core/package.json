@@ -5,6 +5,8 @@
   "type": "module",
   "exports": {
     "./diagram": "./src/diagram.js",
+    "./diagramLayout": "./src/diagramLayout.js",
+    "./beats": "./src/beats.js",
     "./repository": "./src/repository.js"
   }
 }

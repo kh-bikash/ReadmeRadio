@@ -1,5 +1,5 @@
 export interface DiagramNode { id: string; label: string }
-export interface DiagramConnection { from: string; to: string }
+export interface DiagramConnection { from: string; to: string; label?: string }
 export interface LayoutNode extends DiagramNode { x: number; y: number; col: number; row: number }
 export interface CaptionCue { start: number; end: number; text: string }
 export function parseMermaid(code: string): { nodes: DiagramNode[]; connections: DiagramConnection[] };
