@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "repository": "psf/requests",
+  "engine": "remotion",
+  "tone": "friendly",
+  "aspectRatio": "16:9",
+  "duration": 106.15,
+  "generatedAt": "2026-07-15T22:11:27.241Z",
+  "files": [
+    "explainer.mp4",
+    "episode.wav",
+    "captions.srt",
+    "captions.vtt",
+    "captions.json",
+    "words.json",
+    "script.txt",
+    "architecture.mermaid"
+  ]
+}

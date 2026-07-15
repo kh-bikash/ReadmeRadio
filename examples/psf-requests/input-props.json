@@ -1,0 +1,1960 @@
+{
+  "title": "psf/requests",
+  "script": "Hey there, are you tired of manually handling HTTP requests in your Python code? Let me introduce you to the magic of the Requests library. HTTP requests are the bread and butter of web communication. They're how your browser talks to websites and gets information. The Requests library is like a Swiss Army knife for Python. It simplifies sending HTTP requests and handling responses, making your web interactions a breeze. With Requests, you can write Python code that sends requests to web services, processes the responses, and even handle authentication. You start by importing the Requests library into your Python script. Then, you use it to send a request to a web service, like getting data from a website. Once the web service responds, Requests automatically parses the response and gives you access to the data, like the status code, headers, and the actual content. With this data, you can perform actions like updating your application or storing information, all thanks to the power of Requests. Let's see the difference between doing web requests without Requests and with it. Without Requests, you'd have to manually handle URL encoding, form data, and SSL verification. With Requests, it's all automated. You just write simple Python code to send your requests and get the data you need. Requests is a Python library that allows you to send HTTP requests easily. It simplifies the process of interacting with web services, making it easier to retrieve data and handle responses. So there you have it, the Requests library is a game-changer for web development in Python. It takes the complexity out of HTTP requests, allowing you to focus on building great applications. Give it a try and see the difference it makes!",
+  "captions": [
+    {
+      "index": 1,
+      "start": 0.32,
+      "end": 2.62,
+      "text": "Hey there, are you tired of manually handling"
+    },
+    {
+      "index": 2,
+      "start": 2.88,
+      "end": 4.86,
+      "text": "HTTP requests in your Python code?"
+    },
+    {
+      "index": 3,
+      "start": 5.361,
+      "end": 6.901,
+      "text": "Let me introduce you to the magic of"
+    },
+    {
+      "index": 4,
+      "start": 6.921,
+      "end": 7.901,
+      "text": "the Requests library."
+    },
+    {
+      "index": 5,
+      "start": 8.761,
+      "end": 11.181,
+      "text": "HTTP requests are the bread and butter of"
+    },
+    {
+      "index": 6,
+      "start": 11.261,
+      "end": 12.161,
+      "text": "web communication."
+    },
+    {
+      "index": 7,
+      "start": 12.741,
+      "end": 14.721,
+      "text": "They're how your browser talks to websites and"
+    },
+    {
+      "index": 8,
+      "start": 14.761,
+      "end": 15.561,
+      "text": "gets information."
+    },
+    {
+      "index": 9,
+      "start": 16.222,
+      "end": 18.422,
+      "text": "The Requests library is like a Swiss Army"
+    },
+    {
+      "index": 10,
+      "start": 18.482,
+      "end": 19.502,
+      "text": "knife for Python."
+    },
+    {
+      "index": 11,
+      "start": 20.122,
+      "end": 23.882,
+      "text": "It simplifies sending HTTP requests and handling responses,"
+    },
+    {
+      "index": 12,
+      "start": 24.282,
+      "end": 26.042,
+      "text": "making your web interactions a breeze."
+    },
+    {
+      "index": 13,
+      "start": 26.883,
+      "end": 28.943,
+      "text": "With Requests, you can write Python code that"
+    },
+    {
+      "index": 14,
+      "start": 28.983,
+      "end": 32.203,
+      "text": "sends requests to web services, processes the responses,"
+    },
+    {
+      "index": 15,
+      "start": 32.483,
+      "end": 34.103,
+      "text": "and even handle authentication."
+    },
+    {
+      "index": 16,
+      "start": 34.863,
+      "end": 37.183,
+      "text": "You start by importing the Requests library into"
+    },
+    {
+      "index": 17,
+      "start": 37.203,
+      "end": 38.164,
+      "text": "your Python script."
+    },
+    {
+      "index": 18,
+      "start": 38.784,
+      "end": 40.404,
+      "text": "Then, you use it to send a request"
+    },
+    {
+      "index": 19,
+      "start": 40.444,
+      "end": 42.524,
+      "text": "to a web service, like getting data from"
+    },
+    {
+      "index": 20,
+      "start": 42.544,
+      "end": 43.084,
+      "text": "a website."
+    },
+    {
+      "index": 21,
+      "start": 43.784,
+      "end": 47.204,
+      "text": "Once the web service responds, Requests automatically parses"
+    },
+    {
+      "index": 22,
+      "start": 47.264,
+      "end": 49.125,
+      "text": "the response and gives you access to the"
+    },
+    {
+      "index": 23,
+      "start": 49.165,
+      "end": 52.025,
+      "text": "data, like the status code, headers, and the"
+    },
+    {
+      "index": 24,
+      "start": 52.125,
+      "end": 52.985,
+      "text": "actual content."
+    },
+    {
+      "index": 25,
+      "start": 53.825,
+      "end": 56.005,
+      "text": "With this data, you can perform actions like"
+    },
+    {
+      "index": 26,
+      "start": 56.065,
+      "end": 59.306,
+      "text": "updating your application or storing information, all thanks"
+    },
+    {
+      "index": 27,
+      "start": 59.366,
+      "end": 60.546,
+      "text": "to the power of Requests."
+    },
+    {
+      "index": 28,
+      "start": 61.166,
+      "end": 63.346,
+      "text": "Let's see the difference between doing web requests"
+    },
+    {
+      "index": 29,
+      "start": 63.386,
+      "end": 64.826,
+      "text": "without Requests and with it."
+    },
+    {
+      "index": 30,
+      "start": 65.426,
+      "end": 68.446,
+      "text": "Without Requests, you'd have to manually handle URL"
+    },
+    {
+      "index": 31,
+      "start": 68.526,
+      "end": 71.667,
+      "text": "encoding, form data, and SSL verification."
+    },
+    {
+      "index": 32,
+      "start": 72.307,
+      "end": 74.247,
+      "text": "With Requests, it's all automated."
+    },
+    {
+      "index": 33,
+      "start": 74.787,
+      "end": 76.767,
+      "text": "You just write simple Python code to send"
+    },
+    {
+      "index": 34,
+      "start": 76.787,
+      "end": 78.707,
+      "text": "your requests and get the data you need."
+    },
+    {
+      "index": 35,
+      "start": 79.587,
+      "end": 82.068,
+      "text": "Requests is a Python library that allows you"
+    },
+    {
+      "index": 36,
+      "start": 82.088,
+      "end": 84.228,
+      "text": "to send HTTP requests easily."
+    },
+    {
+      "index": 37,
+      "start": 84.928,
+      "end": 87.208,
+      "text": "It simplifies the process of interacting with web"
+    },
+    {
+      "index": 38,
+      "start": 87.268,
+      "end": 90.328,
+      "text": "services, making it easier to retrieve data and"
+    },
+    {
+      "index": 39,
+      "start": 90.368,
+      "end": 91.289,
+      "text": "handle responses."
+    },
+    {
+      "index": 40,
+      "start": 91.969,
+      "end": 94.129,
+      "text": "So there you have it, the Requests library"
+    },
+    {
+      "index": 41,
+      "start": 94.229,
+      "end": 96.829,
+      "text": "is a game-changer for web development in Python."
+    },
+    {
+      "index": 42,
+      "start": 97.509,
+      "end": 100.289,
+      "text": "It takes the complexity out of HTTP requests,"
+    },
+    {
+      "index": 43,
+      "start": 100.669,
+      "end": 103.43,
+      "text": "allowing you to focus on building great applications."
+    },
+    {
+      "index": 44,
+      "start": 104.05,
+      "end": 105.73,
+      "text": "Give it a try and see the difference"
+    },
+    {
+      "index": 45,
+      "start": 105.75,
+      "end": 106.15,
+      "text": "it makes!"
+    }
+  ],
+  "words": [
+    {
+      "word": "Hey",
+      "start": 0.32,
+      "end": 0.46
+    },
+    {
+      "word": "there,",
+      "start": 0.52,
+      "end": 0.74
+    },
+    {
+      "word": "are",
+      "start": 0.94,
+      "end": 1.04
+    },
+    {
+      "word": "you",
+      "start": 1.04,
+      "end": 1.12
+    },
+    {
+      "word": "tired",
+      "start": 1.18,
+      "end": 1.58
+    },
+    {
+      "word": "of",
+      "start": 1.6,
+      "end": 1.66
+    },
+    {
+      "word": "manually",
+      "start": 1.76,
+      "end": 2.16
+    },
+    {
+      "word": "handling",
+      "start": 2.22,
+      "end": 2.62
+    },
+    {
+      "word": "HTTP",
+      "start": 2.88,
+      "end": 3.3
+    },
+    {
+      "word": "requests",
+      "start": 3.46,
+      "end": 3.86
+    },
+    {
+      "word": "in",
+      "start": 3.88,
+      "end": 3.94
+    },
+    {
+      "word": "your",
+      "start": 3.96,
+      "end": 4.06
+    },
+    {
+      "word": "Python",
+      "start": 4.08,
+      "end": 4.48
+    },
+    {
+      "word": "code?",
+      "start": 4.54,
+      "end": 4.86
+    },
+    {
+      "word": "Let",
+      "start": 5.361,
+      "end": 5.461
+    },
+    {
+      "word": "me",
+      "start": 5.501,
+      "end": 5.541
+    },
+    {
+      "word": "introduce",
+      "start": 5.621,
+      "end": 6.081
+    },
+    {
+      "word": "you",
+      "start": 6.101,
+      "end": 6.201
+    },
+    {
+      "word": "to",
+      "start": 6.241,
+      "end": 6.301
+    },
+    {
+      "word": "the",
+      "start": 6.341,
+      "end": 6.421
+    },
+    {
+      "word": "magic",
+      "start": 6.461,
+      "end": 6.821
+    },
+    {
+      "word": "of",
+      "start": 6.841,
+      "end": 6.901
+    },
+    {
+      "word": "the",
+      "start": 6.921,
+      "end": 7.001
+    },
+    {
+      "word": "Requests",
+      "start": 7.021,
+      "end": 7.401
+    },
+    {
+      "word": "library.",
+      "start": 7.461,
+      "end": 7.901
+    },
+    {
+      "word": "HTTP",
+      "start": 8.761,
+      "end": 9.181
+    },
+    {
+      "word": "requests",
+      "start": 9.361,
+      "end": 9.861
+    },
+    {
+      "word": "are",
+      "start": 10.001,
+      "end": 10.081
+    },
+    {
+      "word": "the",
+      "start": 10.081,
+      "end": 10.161
+    },
+    {
+      "word": "bread",
+      "start": 10.221,
+      "end": 10.541
+    },
+    {
+      "word": "and",
+      "start": 10.661,
+      "end": 10.761
+    },
+    {
+      "word": "butter",
+      "start": 10.801,
+      "end": 11.041
+    },
+    {
+      "word": "of",
+      "start": 11.121,
+      "end": 11.181
+    },
+    {
+      "word": "web",
+      "start": 11.261,
+      "end": 11.401
+    },
+    {
+      "word": "communication.",
+      "start": 11.461,
+      "end": 12.161
+    },
+    {
+      "word": "They're",
+      "start": 12.741,
+      "end": 12.881
+    },
+    {
+      "word": "how",
+      "start": 12.881,
+      "end": 13.001
+    },
+    {
+      "word": "your",
+      "start": 13.041,
+      "end": 13.161
+    },
+    {
+      "word": "browser",
+      "start": 13.181,
+      "end": 13.541
+    },
+    {
+      "word": "talks",
+      "start": 13.601,
+      "end": 13.881
+    },
+    {
+      "word": "to",
+      "start": 13.921,
+      "end": 13.981
+    },
+    {
+      "word": "websites",
+      "start": 14.041,
+      "end": 14.561
+    },
+    {
+      "word": "and",
+      "start": 14.621,
+      "end": 14.721
+    },
+    {
+      "word": "gets",
+      "start": 14.761,
+      "end": 14.941
+    },
+    {
+      "word": "information.",
+      "start": 14.961,
+      "end": 15.561
+    },
+    {
+      "word": "The",
+      "start": 16.222,
+      "end": 16.302
+    },
+    {
+      "word": "Requests",
+      "start": 16.342,
+      "end": 16.742
+    },
+    {
+      "word": "library",
+      "start": 16.782,
+      "end": 17.222
+    },
+    {
+      "word": "is",
+      "start": 17.402,
+      "end": 17.482
+    },
+    {
+      "word": "like",
+      "start": 17.522,
+      "end": 17.682
+    },
+    {
+      "word": "a",
+      "start": 17.682,
+      "end": 17.702
+    },
+    {
+      "word": "Swiss",
+      "start": 17.822,
+      "end": 18.082
+    },
+    {
+      "word": "Army",
+      "start": 18.222,
+      "end": 18.422
+    },
+    {
+      "word": "knife",
+      "start": 18.482,
+      "end": 18.802
+    },
+    {
+      "word": "for",
+      "start": 18.882,
+      "end": 18.982
+    },
+    {
+      "word": "Python.",
+      "start": 19.002,
+      "end": 19.502
+    },
+    {
+      "word": "It",
+      "start": 20.122,
+      "end": 20.202
+    },
+    {
+      "word": "simplifies",
+      "start": 20.262,
+      "end": 20.842
+    },
+    {
+      "word": "sending",
+      "start": 20.902,
+      "end": 21.202
+    },
+    {
+      "word": "HTTP",
+      "start": 21.462,
+      "end": 21.902
+    },
+    {
+      "word": "requests",
+      "start": 22.082,
+      "end": 22.622
+    },
+    {
+      "word": "and",
+      "start": 22.722,
+      "end": 22.822
+    },
+    {
+      "word": "handling",
+      "start": 22.862,
+      "end": 23.242
+    },
+    {
+      "word": "responses,",
+      "start": 23.262,
+      "end": 23.882
+    },
+    {
+      "word": "making",
+      "start": 24.282,
+      "end": 24.562
+    },
+    {
+      "word": "your",
+      "start": 24.582,
+      "end": 24.682
+    },
+    {
+      "word": "web",
+      "start": 24.722,
+      "end": 24.882
+    },
+    {
+      "word": "interactions",
+      "start": 24.922,
+      "end": 25.482
+    },
+    {
+      "word": "a",
+      "start": 25.522,
+      "end": 25.542
+    },
+    {
+      "word": "breeze.",
+      "start": 25.582,
+      "end": 26.042
+    },
+    {
+      "word": "With",
+      "start": 26.883,
+      "end": 27.003
+    },
+    {
+      "word": "Requests,",
+      "start": 27.043,
+      "end": 27.583
+    },
+    {
+      "word": "you",
+      "start": 27.663,
+      "end": 27.743
+    },
+    {
+      "word": "can",
+      "start": 27.743,
+      "end": 27.863
+    },
+    {
+      "word": "write",
+      "start": 27.863,
+      "end": 28.063
+    },
+    {
+      "word": "Python",
+      "start": 28.083,
+      "end": 28.463
+    },
+    {
+      "word": "code",
+      "start": 28.523,
+      "end": 28.823
+    },
+    {
+      "word": "that",
+      "start": 28.823,
+      "end": 28.943
+    },
+    {
+      "word": "sends",
+      "start": 28.983,
+      "end": 29.163
+    },
+    {
+      "word": "requests",
+      "start": 29.203,
+      "end": 29.603
+    },
+    {
+      "word": "to",
+      "start": 29.623,
+      "end": 29.683
+    },
+    {
+      "word": "web",
+      "start": 29.763,
+      "end": 29.903
+    },
+    {
+      "word": "services,",
+      "start": 29.963,
+      "end": 30.503
+    },
+    {
+      "word": "processes",
+      "start": 30.863,
+      "end": 31.423
+    },
+    {
+      "word": "the",
+      "start": 31.463,
+      "end": 31.543
+    },
+    {
+      "word": "responses,",
+      "start": 31.583,
+      "end": 32.203
+    },
+    {
+      "word": "and",
+      "start": 32.483,
+      "end": 32.563
+    },
+    {
+      "word": "even",
+      "start": 32.643,
+      "end": 32.823
+    },
+    {
+      "word": "handle",
+      "start": 32.923,
+      "end": 33.283
+    },
+    {
+      "word": "authentication.",
+      "start": 33.323,
+      "end": 34.103
+    },
+    {
+      "word": "You",
+      "start": 34.863,
+      "end": 34.963
+    },
+    {
+      "word": "start",
+      "start": 35.003,
+      "end": 35.283
+    },
+    {
+      "word": "by",
+      "start": 35.343,
+      "end": 35.443
+    },
+    {
+      "word": "importing",
+      "start": 35.503,
+      "end": 35.963
+    },
+    {
+      "word": "the",
+      "start": 35.983,
+      "end": 36.063
+    },
+    {
+      "word": "Requests",
+      "start": 36.083,
+      "end": 36.483
+    },
+    {
+      "word": "library",
+      "start": 36.543,
+      "end": 36.963
+    },
+    {
+      "word": "into",
+      "start": 37.063,
+      "end": 37.183
+    },
+    {
+      "word": "your",
+      "start": 37.203,
+      "end": 37.303
+    },
+    {
+      "word": "Python",
+      "start": 37.323,
+      "end": 37.744
+    },
+    {
+      "word": "script.",
+      "start": 37.804,
+      "end": 38.164
+    },
+    {
+      "word": "Then,",
+      "start": 38.784,
+      "end": 38.984
+    },
+    {
+      "word": "you",
+      "start": 39.204,
+      "end": 39.304
+    },
+    {
+      "word": "use",
+      "start": 39.364,
+      "end": 39.504
+    },
+    {
+      "word": "it",
+      "start": 39.504,
+      "end": 39.584
+    },
+    {
+      "word": "to",
+      "start": 39.604,
+      "end": 39.664
+    },
+    {
+      "word": "send",
+      "start": 39.724,
+      "end": 39.884
+    },
+    {
+      "word": "a",
+      "start": 39.924,
+      "end": 39.944
+    },
+    {
+      "word": "request",
+      "start": 39.984,
+      "end": 40.404
+    },
+    {
+      "word": "to",
+      "start": 40.444,
+      "end": 40.504
+    },
+    {
+      "word": "a",
+      "start": 40.564,
+      "end": 40.584
+    },
+    {
+      "word": "web",
+      "start": 40.644,
+      "end": 40.804
+    },
+    {
+      "word": "service,",
+      "start": 40.884,
+      "end": 41.304
+    },
+    {
+      "word": "like",
+      "start": 41.584,
+      "end": 41.764
+    },
+    {
+      "word": "getting",
+      "start": 41.784,
+      "end": 42.064
+    },
+    {
+      "word": "data",
+      "start": 42.104,
+      "end": 42.324
+    },
+    {
+      "word": "from",
+      "start": 42.384,
+      "end": 42.524
+    },
+    {
+      "word": "a",
+      "start": 42.544,
+      "end": 42.564
+    },
+    {
+      "word": "website.",
+      "start": 42.604,
+      "end": 43.084
+    },
+    {
+      "word": "Once",
+      "start": 43.784,
+      "end": 43.964
+    },
+    {
+      "word": "the",
+      "start": 43.964,
+      "end": 44.064
+    },
+    {
+      "word": "web",
+      "start": 44.084,
+      "end": 44.224
+    },
+    {
+      "word": "service",
+      "start": 44.304,
+      "end": 44.624
+    },
+    {
+      "word": "responds,",
+      "start": 44.664,
+      "end": 45.244
+    },
+    {
+      "word": "Requests",
+      "start": 45.564,
+      "end": 46.004
+    },
+    {
+      "word": "automatically",
+      "start": 46.124,
+      "end": 46.764
+    },
+    {
+      "word": "parses",
+      "start": 46.804,
+      "end": 47.204
+    },
+    {
+      "word": "the",
+      "start": 47.264,
+      "end": 47.344
+    },
+    {
+      "word": "response",
+      "start": 47.384,
+      "end": 47.944
+    },
+    {
+      "word": "and",
+      "start": 48.045,
+      "end": 48.145
+    },
+    {
+      "word": "gives",
+      "start": 48.185,
+      "end": 48.365
+    },
+    {
+      "word": "you",
+      "start": 48.385,
+      "end": 48.465
+    },
+    {
+      "word": "access",
+      "start": 48.565,
+      "end": 48.925
+    },
+    {
+      "word": "to",
+      "start": 48.965,
+      "end": 49.025
+    },
+    {
+      "word": "the",
+      "start": 49.065,
+      "end": 49.125
+    },
+    {
+      "word": "data,",
+      "start": 49.165,
+      "end": 49.405
+    },
+    {
+      "word": "like",
+      "start": 49.845,
+      "end": 50.005
+    },
+    {
+      "word": "the",
+      "start": 50.005,
+      "end": 50.085
+    },
+    {
+      "word": "status",
+      "start": 50.125,
+      "end": 50.505
+    },
+    {
+      "word": "code,",
+      "start": 50.545,
+      "end": 50.885
+    },
+    {
+      "word": "headers,",
+      "start": 51.145,
+      "end": 51.585
+    },
+    {
+      "word": "and",
+      "start": 51.865,
+      "end": 51.945
+    },
+    {
+      "word": "the",
+      "start": 51.945,
+      "end": 52.025
+    },
+    {
+      "word": "actual",
+      "start": 52.125,
+      "end": 52.445
+    },
+    {
+      "word": "content.",
+      "start": 52.485,
+      "end": 52.985
+    },
+    {
+      "word": "With",
+      "start": 53.825,
+      "end": 53.965
+    },
+    {
+      "word": "this",
+      "start": 53.985,
+      "end": 54.125
+    },
+    {
+      "word": "data,",
+      "start": 54.185,
+      "end": 54.425
+    },
+    {
+      "word": "you",
+      "start": 54.645,
+      "end": 54.705
+    },
+    {
+      "word": "can",
+      "start": 54.725,
+      "end": 54.825
+    },
+    {
+      "word": "perform",
+      "start": 54.845,
+      "end": 55.225
+    },
+    {
+      "word": "actions",
+      "start": 55.325,
+      "end": 55.745
+    },
+    {
+      "word": "like",
+      "start": 55.805,
+      "end": 56.005
+    },
+    {
+      "word": "updating",
+      "start": 56.065,
+      "end": 56.525
+    },
+    {
+      "word": "your",
+      "start": 56.525,
+      "end": 56.625
+    },
+    {
+      "word": "application",
+      "start": 56.685,
+      "end": 57.325
+    },
+    {
+      "word": "or",
+      "start": 57.465,
+      "end": 57.545
+    },
+    {
+      "word": "storing",
+      "start": 57.605,
+      "end": 57.905
+    },
+    {
+      "word": "information,",
+      "start": 57.925,
+      "end": 58.465
+    },
+    {
+      "word": "all",
+      "start": 58.886,
+      "end": 59.006
+    },
+    {
+      "word": "thanks",
+      "start": 59.066,
+      "end": 59.306
+    },
+    {
+      "word": "to",
+      "start": 59.366,
+      "end": 59.426
+    },
+    {
+      "word": "the",
+      "start": 59.446,
+      "end": 59.526
+    },
+    {
+      "word": "power",
+      "start": 59.566,
+      "end": 59.866
+    },
+    {
+      "word": "of",
+      "start": 59.906,
+      "end": 59.966
+    },
+    {
+      "word": "Requests.",
+      "start": 60.006,
+      "end": 60.546
+    },
+    {
+      "word": "Let's",
+      "start": 61.166,
+      "end": 61.346
+    },
+    {
+      "word": "see",
+      "start": 61.386,
+      "end": 61.506
+    },
+    {
+      "word": "the",
+      "start": 61.526,
+      "end": 61.606
+    },
+    {
+      "word": "difference",
+      "start": 61.626,
+      "end": 62.026
+    },
+    {
+      "word": "between",
+      "start": 62.066,
+      "end": 62.346
+    },
+    {
+      "word": "doing",
+      "start": 62.406,
+      "end": 62.666
+    },
+    {
+      "word": "web",
+      "start": 62.706,
+      "end": 62.866
+    },
+    {
+      "word": "requests",
+      "start": 62.906,
+      "end": 63.346
+    },
+    {
+      "word": "without",
+      "start": 63.386,
+      "end": 63.666
+    },
+    {
+      "word": "Requests",
+      "start": 63.686,
+      "end": 64.206
+    },
+    {
+      "word": "and",
+      "start": 64.326,
+      "end": 64.446
+    },
+    {
+      "word": "with",
+      "start": 64.486,
+      "end": 64.666
+    },
+    {
+      "word": "it.",
+      "start": 64.706,
+      "end": 64.826
+    },
+    {
+      "word": "Without",
+      "start": 65.426,
+      "end": 65.706
+    },
+    {
+      "word": "Requests,",
+      "start": 65.746,
+      "end": 66.326
+    },
+    {
+      "word": "you'd",
+      "start": 66.586,
+      "end": 66.706
+    },
+    {
+      "word": "have",
+      "start": 66.706,
+      "end": 66.846
+    },
+    {
+      "word": "to",
+      "start": 66.866,
+      "end": 66.926
+    },
+    {
+      "word": "manually",
+      "start": 66.986,
+      "end": 67.366
+    },
+    {
+      "word": "handle",
+      "start": 67.426,
+      "end": 67.786
+    },
+    {
+      "word": "URL",
+      "start": 67.946,
+      "end": 68.446
+    },
+    {
+      "word": "encoding,",
+      "start": 68.526,
+      "end": 69.026
+    },
+    {
+      "word": "form",
+      "start": 69.347,
+      "end": 69.607
+    },
+    {
+      "word": "data,",
+      "start": 69.667,
+      "end": 69.907
+    },
+    {
+      "word": "and",
+      "start": 70.147,
+      "end": 70.247
+    },
+    {
+      "word": "SSL",
+      "start": 70.467,
+      "end": 70.847
+    },
+    {
+      "word": "verification.",
+      "start": 70.907,
+      "end": 71.667
+    },
+    {
+      "word": "With",
+      "start": 72.307,
+      "end": 72.427
+    },
+    {
+      "word": "Requests,",
+      "start": 72.467,
+      "end": 73.067
+    },
+    {
+      "word": "it's",
+      "start": 73.267,
+      "end": 73.387
+    },
+    {
+      "word": "all",
+      "start": 73.487,
+      "end": 73.607
+    },
+    {
+      "word": "automated.",
+      "start": 73.747,
+      "end": 74.247
+    },
+    {
+      "word": "You",
+      "start": 74.787,
+      "end": 74.867
+    },
+    {
+      "word": "just",
+      "start": 74.887,
+      "end": 75.027
+    },
+    {
+      "word": "write",
+      "start": 75.047,
+      "end": 75.247
+    },
+    {
+      "word": "simple",
+      "start": 75.307,
+      "end": 75.587
+    },
+    {
+      "word": "Python",
+      "start": 75.627,
+      "end": 76.027
+    },
+    {
+      "word": "code",
+      "start": 76.107,
+      "end": 76.407
+    },
+    {
+      "word": "to",
+      "start": 76.447,
+      "end": 76.507
+    },
+    {
+      "word": "send",
+      "start": 76.587,
+      "end": 76.767
+    },
+    {
+      "word": "your",
+      "start": 76.787,
+      "end": 76.887
+    },
+    {
+      "word": "requests",
+      "start": 76.907,
+      "end": 77.467
+    },
+    {
+      "word": "and",
+      "start": 77.627,
+      "end": 77.727
+    },
+    {
+      "word": "get",
+      "start": 77.767,
+      "end": 77.887
+    },
+    {
+      "word": "the",
+      "start": 77.927,
+      "end": 78.007
+    },
+    {
+      "word": "data",
+      "start": 78.027,
+      "end": 78.267
+    },
+    {
+      "word": "you",
+      "start": 78.327,
+      "end": 78.427
+    },
+    {
+      "word": "need.",
+      "start": 78.467,
+      "end": 78.707
+    },
+    {
+      "word": "Requests",
+      "start": 79.587,
+      "end": 80.088
+    },
+    {
+      "word": "is",
+      "start": 80.148,
+      "end": 80.208
+    },
+    {
+      "word": "a",
+      "start": 80.248,
+      "end": 80.268
+    },
+    {
+      "word": "Python",
+      "start": 80.328,
+      "end": 80.768
+    },
+    {
+      "word": "library",
+      "start": 80.808,
+      "end": 81.248
+    },
+    {
+      "word": "that",
+      "start": 81.468,
+      "end": 81.568
+    },
+    {
+      "word": "allows",
+      "start": 81.608,
+      "end": 81.948
+    },
+    {
+      "word": "you",
+      "start": 81.988,
+      "end": 82.068
+    },
+    {
+      "word": "to",
+      "start": 82.088,
+      "end": 82.148
+    },
+    {
+      "word": "send",
+      "start": 82.228,
+      "end": 82.428
+    },
+    {
+      "word": "HTTP",
+      "start": 82.728,
+      "end": 83.188
+    },
+    {
+      "word": "requests",
+      "start": 83.368,
+      "end": 83.808
+    },
+    {
+      "word": "easily.",
+      "start": 83.908,
+      "end": 84.228
+    },
+    {
+      "word": "It",
+      "start": 84.928,
+      "end": 85.008
+    },
+    {
+      "word": "simplifies",
+      "start": 85.088,
+      "end": 85.628
+    },
+    {
+      "word": "the",
+      "start": 85.668,
+      "end": 85.748
+    },
+    {
+      "word": "process",
+      "start": 85.768,
+      "end": 86.168
+    },
+    {
+      "word": "of",
+      "start": 86.208,
+      "end": 86.268
+    },
+    {
+      "word": "interacting",
+      "start": 86.328,
+      "end": 86.888
+    },
+    {
+      "word": "with",
+      "start": 86.908,
+      "end": 87.008
+    },
+    {
+      "word": "web",
+      "start": 87.068,
+      "end": 87.208
+    },
+    {
+      "word": "services,",
+      "start": 87.268,
+      "end": 87.768
+    },
+    {
+      "word": "making",
+      "start": 88.188,
+      "end": 88.468
+    },
+    {
+      "word": "it",
+      "start": 88.488,
+      "end": 88.568
+    },
+    {
+      "word": "easier",
+      "start": 88.688,
+      "end": 89.008
+    },
+    {
+      "word": "to",
+      "start": 89.068,
+      "end": 89.128
+    },
+    {
+      "word": "retrieve",
+      "start": 89.188,
+      "end": 89.628
+    },
+    {
+      "word": "data",
+      "start": 89.648,
+      "end": 89.948
+    },
+    {
+      "word": "and",
+      "start": 90.228,
+      "end": 90.328
+    },
+    {
+      "word": "handle",
+      "start": 90.368,
+      "end": 90.669
+    },
+    {
+      "word": "responses.",
+      "start": 90.689,
+      "end": 91.289
+    },
+    {
+      "word": "So",
+      "start": 91.969,
+      "end": 92.029
+    },
+    {
+      "word": "there",
+      "start": 92.129,
+      "end": 92.309
+    },
+    {
+      "word": "you",
+      "start": 92.349,
+      "end": 92.429
+    },
+    {
+      "word": "have",
+      "start": 92.489,
+      "end": 92.669
+    },
+    {
+      "word": "it,",
+      "start": 92.689,
+      "end": 92.789
+    },
+    {
+      "word": "the",
+      "start": 93.129,
+      "end": 93.209
+    },
+    {
+      "word": "Requests",
+      "start": 93.249,
+      "end": 93.649
+    },
+    {
+      "word": "library",
+      "start": 93.689,
+      "end": 94.129
+    },
+    {
+      "word": "is",
+      "start": 94.229,
+      "end": 94.309
+    },
+    {
+      "word": "a",
+      "start": 94.349,
+      "end": 94.369
+    },
+    {
+      "word": "game-changer",
+      "start": 94.469,
+      "end": 95.149
+    },
+    {
+      "word": "for",
+      "start": 95.229,
+      "end": 95.329
+    },
+    {
+      "word": "web",
+      "start": 95.389,
+      "end": 95.549
+    },
+    {
+      "word": "development",
+      "start": 95.609,
+      "end": 96.129
+    },
+    {
+      "word": "in",
+      "start": 96.229,
+      "end": 96.309
+    },
+    {
+      "word": "Python.",
+      "start": 96.349,
+      "end": 96.829
+    },
+    {
+      "word": "It",
+      "start": 97.509,
+      "end": 97.569
+    },
+    {
+      "word": "takes",
+      "start": 97.609,
+      "end": 97.829
+    },
+    {
+      "word": "the",
+      "start": 97.869,
+      "end": 97.929
+    },
+    {
+      "word": "complexity",
+      "start": 97.969,
+      "end": 98.509
+    },
+    {
+      "word": "out",
+      "start": 98.629,
+      "end": 98.749
+    },
+    {
+      "word": "of",
+      "start": 98.769,
+      "end": 98.829
+    },
+    {
+      "word": "HTTP",
+      "start": 99.089,
+      "end": 99.569
+    },
+    {
+      "word": "requests,",
+      "start": 99.729,
+      "end": 100.289
+    },
+    {
+      "word": "allowing",
+      "start": 100.669,
+      "end": 101.089
+    },
+    {
+      "word": "you",
+      "start": 101.109,
+      "end": 101.189
+    },
+    {
+      "word": "to",
+      "start": 101.229,
+      "end": 101.289
+    },
+    {
+      "word": "focus",
+      "start": 101.37,
+      "end": 101.75
+    },
+    {
+      "word": "on",
+      "start": 101.85,
+      "end": 101.93
+    },
+    {
+      "word": "building",
+      "start": 102.01,
+      "end": 102.35
+    },
+    {
+      "word": "great",
+      "start": 102.43,
+      "end": 102.65
+    },
+    {
+      "word": "applications.",
+      "start": 102.71,
+      "end": 103.43
+    },
+    {
+      "word": "Give",
+      "start": 104.05,
+      "end": 104.17
+    },
+    {
+      "word": "it",
+      "start": 104.17,
+      "end": 104.27
+    },
+    {
+      "word": "a",
+      "start": 104.27,
+      "end": 104.29
+    },
+    {
+      "word": "try",
+      "start": 104.35,
+      "end": 104.73
+    },
+    {
+      "word": "and",
+      "start": 104.97,
+      "end": 105.07
+    },
+    {
+      "word": "see",
+      "start": 105.15,
+      "end": 105.29
+    },
+    {
+      "word": "the",
+      "start": 105.33,
+      "end": 105.41
+    },
+    {
+      "word": "difference",
+      "start": 105.43,
+      "end": 105.73
+    },
+    {
+      "word": "it",
+      "start": 105.75,
+      "end": 105.81
+    },
+    {
+      "word": "makes!",
+      "start": 105.83,
+      "end": 106.15
+    }
+  ],
+  "cueTimes": {
+    "A": 2.88,
+    "B": 6.921,
+    "C": 26.883,
+    "D": 28.983,
+    "E": 40.444
+  },
+  "beats": [
+    {
+      "id": "beat-1",
+      "kind": "hook",
+      "title": "Streamline Your Web Interactions",
+      "narration": "Hey there, are you tired of manually handling HTTP requests in your Python code? Let me introduce you to the magic of the Requests library.",
+      "start": 0,
+      "end": 8.761,
+      "startFrame": 0,
+      "endFrame": 263,
+      "matched": true
+    },
+    {
+      "id": "beat-2",
+      "kind": "concept",
+      "title": "HTTP Requests",
+      "narration": "HTTP requests are the bread and butter of web communication. They're how your browser talks to websites and gets information.",
+      "start": 8.761,
+      "end": 16.222,
+      "startFrame": 263,
+      "endFrame": 487,
+      "matched": true
+    },
+    {
+      "id": "beat-3",
+      "kind": "concept",
+      "title": "Requests Library",
+      "narration": "The Requests library is like a Swiss Army knife for Python. It simplifies sending HTTP requests and handling responses, making your web interactions a breeze.",
+      "start": 16.222,
+      "end": 26.883,
+      "startFrame": 487,
+      "endFrame": 806,
+      "matched": true
+    },
+    {
+      "id": "beat-4",
+      "kind": "concept",
+      "title": "Python Code",
+      "narration": "With Requests, you can write Python code that sends requests to web services, processes the responses, and even handle authentication.",
+      "start": 26.883,
+      "end": 34.863,
+      "startFrame": 806,
+      "endFrame": 1046,
+      "matched": true
+    },
+    {
+      "id": "beat-5",
+      "kind": "how_it_works",
+      "title": "Sending a Request",
+      "narration": "You start by importing the Requests library into your Python script. Then, you use it to send a request to a web service, like getting data from a website.",
+      "nodeIds": [
+        "A",
+        "B",
+        "C"
+      ],
+      "start": 34.863,
+      "end": 43.784,
+      "startFrame": 1046,
+      "endFrame": 1314,
+      "matched": true
+    },
+    {
+      "id": "beat-6",
+      "kind": "how_it_works",
+      "title": "Processing the Response",
+      "narration": "Once the web service responds, Requests automatically parses the response and gives you access to the data, like the status code, headers, and the actual content.",
+      "nodeIds": [
+        "C",
+        "D"
+      ],
+      "start": 43.784,
+      "end": 53.825,
+      "startFrame": 1314,
+      "endFrame": 1615,
+      "matched": true
+    },
+    {
+      "id": "beat-7",
+      "kind": "how_it_works",
+      "title": "Data Retrieval",
+      "narration": "With this data, you can perform actions like updating your application or storing information, all thanks to the power of Requests.",
+      "nodeIds": [
+        "D",
+        "E"
+      ],
+      "start": 53.825,
+      "end": 61.166,
+      "startFrame": 1615,
+      "endFrame": 1835,
+      "matched": true
+    },
+    {
+      "id": "beat-8",
+      "kind": "comparison",
+      "title": "Before and After Requests",
+      "narration": "Let's see the difference between doing web requests without Requests and with it. Without Requests, you'd have to manually handle URL encoding, form data, and SSL verification. With Requests, it's all automated. You just write simple Python code to send your requests and get the data you need.",
+      "comparison": {
+        "leftLabel": "Without psf/requests",
+        "leftItems": [
+          "Manual URL encoding",
+          "Form data handling",
+          "SSL verification"
+        ],
+        "rightLabel": "With psf/requests",
+        "rightItems": [
+          "Automated processes",
+          "Simplified code",
+          "Enhanced security"
+        ]
+      },
+      "start": 61.166,
+      "end": 79.587,
+      "startFrame": 1835,
+      "endFrame": 2388,
+      "matched": true
+    },
+    {
+      "id": "beat-9",
+      "kind": "key_term",
+      "title": "Requests",
+      "narration": "Requests is a Python library that allows you to send HTTP requests easily. It simplifies the process of interacting with web services, making it easier to retrieve data and handle responses.",
+      "keyTerm": {
+        "term": "Requests",
+        "definition": "A Python library for making HTTP requests, simplifying the process of interacting with web services."
+      },
+      "start": 79.587,
+      "end": 91.969,
+      "startFrame": 2388,
+      "endFrame": 2759,
+      "matched": true
+    },
+    {
+      "id": "beat-10",
+      "kind": "recap",
+      "title": "Elevate Your Web Development",
+      "narration": "So there you have it, the Requests library is a game-changer for web development in Python. It takes the complexity out of HTTP requests, allowing you to focus on building great applications. Give it a try and see the difference it makes!",
+      "start": 91.969,
+      "end": 106.15,
+      "startFrame": 2759,
+      "endFrame": 3185,
+      "matched": false
+    }
+  ],
+  "readmeData": {
+    "features": [
+      "Keep-Alive & Connection Pooling",
+      "International Domains and URLs",
+      "Sessions with Cookie Persistence",
+      "Browser-style TLS/SSL Verification",
+      "Basic & Digest Authentication",
+      "Familiar dict–like Cookies",
+      "Automatic Content Decompression and Decoding",
+      "Multi-part File Uploads"
+    ],
+    "codeBlocks": [
+      {
+        "lang": "python",
+        "code": ">>> import requests\n>>> r = requests.get('https://httpbin.org/basic-auth/user/pass', auth=('user', 'pass'))\n>>> r.status_code\n200\n>>> r.headers['content-type']\n'application/json; charset=utf8'\n>>> r.encoding\n'utf-8'\n>>> r.text\n'{\"authenticated\": true, ...'\n>>> r.json()\n{'authenticated': True, ...}"
+      },
+      {
+        "lang": "console",
+        "code": "$ python -m pip install requests"
+      },
+      {
+        "lang": "shell",
+        "code": "git clone -c fetch.fsck.badTimezone=ignore https://github.com/psf/requests.git"
+      }
+    ],
+    "headers": [
+      "Requests",
+      "Installing Requests and Supported Versions",
+      "Supported Features & Best–Practices",
+      "Cloning the repository"
+    ],
+    "description": "Requests is a simple, yet elegant, HTTP library."
+  },
+  "mermaidCode": "graph TD\n  A[HTTP Requests] --> B[Requests Library]\n  B --> C[Python Code]\n  C --> D[Web Services]\n  D --> E[Data Retrieval]",
+  "duration": 106.15,
+  "layout": {
+    "A": {
+      "id": "A",
+      "label": "HTTP Requests",
+      "x": 32,
+      "y": 32,
+      "col": 0,
+      "row": 0
+    },
+    "B": {
+      "id": "B",
+      "label": "Requests Library",
+      "x": 230,
+      "y": 32,
+      "col": 1,
+      "row": 0
+    },
+    "C": {
+      "id": "C",
+      "label": "Python Code",
+      "x": 428,
+      "y": 32,
+      "col": 2,
+      "row": 0
+    },
+    "D": {
+      "id": "D",
+      "label": "Web Services",
+      "x": 32,
+      "y": 380,
+      "col": 0,
+      "row": 1
+    },
+    "E": {
+      "id": "E",
+      "label": "Data Retrieval",
+      "x": 230,
+      "y": 380,
+      "col": 1,
+      "row": 1
+    }
+  },
+  "connections": [
+    {
+      "from": "A",
+      "to": "B"
+    },
+    {
+      "from": "B",
+      "to": "C"
+    },
+    {
+      "from": "C",
+      "to": "D"
+    },
+    {
+      "from": "D",
+      "to": "E"
+    }
+  ],
+  "audioUrl": "jobs/psf-requests/episode.wav",
+  "aspectRatio": "16:9"
+}
